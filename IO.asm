@@ -63,7 +63,7 @@ start:
 
 ;进入死循环
 clockloop:
-    ;1时钟与动画
+    ;1时钟
         mov bx,6
         mov si,0
         ;循环读取CMOS时间数据
@@ -161,8 +161,14 @@ clockloop:
     call delay1
 jmp clockloop
 
+
+
 ;按下后程序
 newint9:
+    push ax
+    push bx
+    push es
+    
     call clearscreen
     ;设置光标位置
     mov ah, 02h
@@ -184,9 +190,23 @@ newint9:
     pop es:[9*4]
     push ds:[2]
     pop es:[9*4+2]
+
+    in al,60h
+    pushf
+    pushf
+    pop bx
+    and bh,11111100b
+    push bx
+    popf
+    call dword ptr ds:[0]
+
+    pop es
+    pop bx
+    pop ax
     ;结束
     mov ax,4c00h
     int 21h
+    iret
 
 ;延时
 delay1:
